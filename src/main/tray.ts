@@ -20,6 +20,8 @@ import { downloadVencordAsar } from "./utils/vencordLoader";
 type TrayVariant = "tray" | "trayUnread" | "traySpeaking" | "trayIdle" | "trayMuted" | "trayDeafened";
 
 const isLinux = process.platform === "linux";
+const trayTitle = app.commandLine.getSwitchValue("tray-title") || "Equibop";
+const trayIconName = app.commandLine.getSwitchValue("tray-icon-name");
 
 let nativeSNI: typeof import("libvesktop") | null = null;
 if (isLinux) {
@@ -151,6 +153,13 @@ async function updateTrayIconElectron(variant: TrayVariant) {
 
 const setTrayVariantListener = (variant: TrayVariant) => {
     if (useNativeTray) {
+        if (process.platform === "linux" && nativeSNI) {
+            if (trayIconName) {
+                const status = variant === "trayUnread" ? "NeedsAttention" : "Active";
+                nativeSNI.setStatusNotifierStatus(status);
+                return;
+            }
+        }
         updateTrayIconNative(variant);
     } else {
         updateTrayIconElectron(variant);
@@ -218,9 +227,16 @@ export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean)
                 useNativeTray = true;
                 nativeTrayInitialized = true;
 
-                const pixmap = await getCachedTrayPixmap(trayVariant);
-                nativeSNI.setStatusNotifierIcon(pixmap);
-                nativeSNI.setStatusNotifierTitle("Equibop");
+                if (trayIconName) {
+                    nativeSNI.setStatusNotifierIconName(trayIconName);
+                    nativeSNI.setStatusNotifierAttentionIconName(`${trayIconName}_unread`);
+                    nativeSNI.setStatusNotifierStatus("Active");
+                } else {
+                    const pixmap = await getCachedTrayPixmap(trayVariant);
+                    nativeSNI.setStatusNotifierIcon(pixmap);
+                }
+
+                nativeSNI.setStatusNotifierTitle(trayTitle);
 
                 const menuItems = [
                     { id: 1, label: win.isVisible() ? "Hide" : "Open", enabled: true, visible: true },
@@ -373,7 +389,7 @@ export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean)
     try {
         const initialImage = await getCachedTrayImage(trayVariant);
         tray = new Tray(initialImage);
-        tray.setToolTip("Equibop");
+        tray.setToolTip(trayTitle);
 
         if (isLinux) {
             tray.on("click", onTrayClick);

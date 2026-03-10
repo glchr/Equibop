@@ -63,6 +63,16 @@ const options = {
         type: "boolean",
         short: "r",
         description: "Re-download Equicord and restart"
+    },
+    "tray-title": {
+        type: "string",
+        hidden: true,
+        description: "Override the tray title"
+    },
+    "tray-icon-name": {
+        type: "string",
+        hidden: true,
+        description: "Override the tray icon name"
     }
 } satisfies Record<string, Option>;
 
@@ -147,7 +157,9 @@ export function checkCommandLineForHelpOrVersion() {
                     "short" in opt && `-${opt.short}`,
                     `--${name}`,
                     opt.type !== "boolean" &&
-                        ("options" in opt ? `<${opt.options.join(" | ")}>` : `<${opt.argumentName ?? opt.type}>`)
+                        ("options" in opt
+                            ? `<${opt.options.join(" | ")}>`
+                            : `<${("argumentName" in opt && opt.argumentName) || opt.type}>`)
                 ]
                     .filter(Boolean)
                     .join(" ");

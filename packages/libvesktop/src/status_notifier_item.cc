@@ -191,7 +191,7 @@ GVariant *StatusNotifierItem::handle_get_property(
     }
     else if (g_strcmp0(property_name, "IconName") == 0)
     {
-        return g_variant_new_string("");
+        return g_variant_new_string(self->current_icon_name.c_str());
     }
     else if (g_strcmp0(property_name, "IconPixmap") == 0)
     {
@@ -223,7 +223,7 @@ GVariant *StatusNotifierItem::handle_get_property(
     }
     else if (g_strcmp0(property_name, "AttentionIconName") == 0)
     {
-        return g_variant_new_string("");
+        return g_variant_new_string(self->current_attention_icon_name.c_str());
     }
     else if (g_strcmp0(property_name, "ToolTip") == 0)
     {
@@ -713,6 +713,99 @@ bool StatusNotifierItem::set_title(const std::string &title)
         object_path.c_str(),
         SNI_INTERFACE,
         "NewTitle",
+        nullptr,
+        &error);
+
+    if (!result || error)
+    {
+        GErrorPtr error_ptr(error);
+        return false;
+    }
+
+    return true;
+}
+
+bool StatusNotifierItem::set_status(const std::string &status)
+{
+    if (!bus || status == current_status)
+        return true;
+
+    current_status = status;
+
+    if (!registered_with_watcher && !register_with_watcher())
+    {
+        return false;
+    }
+
+    GError *error = nullptr;
+    gboolean result = g_dbus_connection_emit_signal(
+        bus.get(),
+        nullptr,
+        object_path.c_str(),
+        SNI_INTERFACE,
+        "NewStatus",
+        g_variant_new("(s)", current_status.c_str()),
+        &error);
+
+    if (!result || error)
+    {
+        GErrorPtr error_ptr(error);
+        return false;
+    }
+
+    return true;
+}
+
+bool StatusNotifierItem::set_icon_name(const std::string &icon_name)
+{
+    if (!bus || icon_name == current_icon_name)
+        return true;
+
+    current_icon_name = icon_name;
+
+    if (!registered_with_watcher && !register_with_watcher())
+    {
+        return false;
+    }
+
+    GError *error = nullptr;
+    gboolean result = g_dbus_connection_emit_signal(
+        bus.get(),
+        nullptr,
+        object_path.c_str(),
+        SNI_INTERFACE,
+        "NewIcon",
+        nullptr,
+        &error);
+
+    if (!result || error)
+    {
+        GErrorPtr error_ptr(error);
+        return false;
+    }
+
+    return true;
+}
+
+bool StatusNotifierItem::set_attention_icon_name(const std::string &icon_name)
+{
+    if (!bus || icon_name == current_attention_icon_name)
+        return true;
+
+    current_attention_icon_name = icon_name;
+
+    if (!registered_with_watcher && !register_with_watcher())
+    {
+        return false;
+    }
+
+    GError *error = nullptr;
+    gboolean result = g_dbus_connection_emit_signal(
+        bus.get(),
+        nullptr,
+        object_path.c_str(),
+        SNI_INTERFACE,
+        "NewIcon",
         nullptr,
         &error);
 
