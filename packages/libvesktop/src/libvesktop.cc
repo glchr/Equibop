@@ -328,6 +328,72 @@ Napi::Value SetStatusNotifierTitle(const Napi::CallbackInfo &info)
     return Napi::Boolean::New(env, success);
 }
 
+Napi::Value SetStatusNotifierStatus(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+
+    if (info.Length() < 1 || !info[0].IsString())
+    {
+        Napi::TypeError::New(env, "Expected (string)").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (!g_sni_instance)
+    {
+        Napi::Error::New(env, "StatusNotifierItem not initialized").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    std::string status = info[0].As<Napi::String>().Utf8Value();
+    bool success = g_sni_instance->set_status(status);
+
+    return Napi::Boolean::New(env, success);
+}
+
+Napi::Value SetStatusNotifierIconName(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+
+    if (info.Length() < 1 || !info[0].IsString())
+    {
+        Napi::TypeError::New(env, "Expected (string)").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (!g_sni_instance)
+    {
+        Napi::Error::New(env, "StatusNotifierItem not initialized").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    std::string icon_name = info[0].As<Napi::String>().Utf8Value();
+    bool success = g_sni_instance->set_icon_name(icon_name);
+
+    return Napi::Boolean::New(env, success);
+}
+
+Napi::Value SetStatusNotifierAttentionIconName(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+
+    if (info.Length() < 1 || !info[0].IsString())
+    {
+        Napi::TypeError::New(env, "Expected (string)").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (!g_sni_instance)
+    {
+        Napi::Error::New(env, "StatusNotifierItem not initialized").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    std::string icon_name = info[0].As<Napi::String>().Utf8Value();
+    bool success = g_sni_instance->set_attention_icon_name(icon_name);
+
+    return Napi::Boolean::New(env, success);
+}
+
 Napi::Value SetStatusNotifierMenu(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
@@ -501,6 +567,9 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     exports.Set("initStatusNotifierItem", Napi::Function::New(env, InitStatusNotifierItem));
     exports.Set("setStatusNotifierIcon", Napi::Function::New(env, SetStatusNotifierIcon));
     exports.Set("setStatusNotifierTitle", Napi::Function::New(env, SetStatusNotifierTitle));
+    exports.Set("setStatusNotifierStatus", Napi::Function::New(env, SetStatusNotifierStatus));
+    exports.Set("setStatusNotifierIconName", Napi::Function::New(env, SetStatusNotifierIconName));
+    exports.Set("setStatusNotifierAttentionIconName", Napi::Function::New(env, SetStatusNotifierAttentionIconName));
     exports.Set("setStatusNotifierMenu", Napi::Function::New(env, SetStatusNotifierMenu));
     exports.Set("updateStatusNotifierMenuItem", Napi::Function::New(env, UpdateStatusNotifierMenuItem));
     exports.Set("setStatusNotifierMenuClickCallback", Napi::Function::New(env, SetStatusNotifierMenuClickCallback));

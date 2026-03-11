@@ -69,6 +69,16 @@ const options = {
         hidden: true,
         description:
             "The name of the application (used for DBus service name, etc.). For KDE, ensure this matches exactly your .desktop file name (eg. use your-profile for your-profile.desktop)."
+    },
+    "tray-title": {
+        type: "string",
+        hidden: true,
+        description: "Override the tray title"
+    },
+    "tray-icon-name": {
+        type: "string",
+        hidden: true,
+        description: "Override the tray icon name"
     }
 } satisfies Record<string, Option>;
 

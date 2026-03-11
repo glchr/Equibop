@@ -46,6 +46,8 @@ private:
     std::string current_status = "Active";
     std::string current_icon_path;
     std::string current_title = "Equibop";
+    std::string current_icon_name;
+    std::string current_attention_icon_name;
     std::vector<uint8_t> current_icon_pixmap;
     std::vector<MenuItem> menu_items;
     uint32_t menu_revision = 1;
@@ -118,6 +120,9 @@ public:
     bool initialize();
     bool set_icon_pixmap(const std::vector<uint8_t> &pixmap_data);
     bool set_title(const std::string &title);
+    bool set_status(const std::string &status);
+    bool set_icon_name(const std::string &icon_name);
+    bool set_attention_icon_name(const std::string &icon_name);
     bool set_menu(const std::vector<MenuItem> &items);
     bool update_menu_item_label(int32_t id, const std::string &new_label);
     void set_menu_click_callback(std::function<void(int32_t)> callback);
