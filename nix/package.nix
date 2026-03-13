@@ -84,8 +84,13 @@ stdenv.mkDerivation (finalAttrs: {
   postPatch = ''
     # electron-builder tries to mutate the copied Electron binary when
     # electronFuses is configured, which fails against Nix store-sourced bits.
-    substituteInPlace package.json \
-      --replace-fail '"electronFuses": {' '"electronFusesDisabledForNix": {'
+    node -e '
+      const fs = require("fs");
+      const path = "package.json";
+      const pkg = JSON.parse(fs.readFileSync(path, "utf8"));
+      delete pkg.build.electronFuses;
+      fs.writeFileSync(path, JSON.stringify(pkg, null, 4) + "\n");
+    '
   '';
 
   buildInputs = [
