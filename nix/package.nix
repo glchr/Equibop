@@ -15,7 +15,7 @@
   src,
   withTTS ? true,
   withMiddleClickScroll ? false,
-  nodeModulesHash ? lib.fakeHash,
+  nodeModulesHash ? "sha256-zsdMwgngsP51Y4Eg9/UgpF8o/zvFvmUxg6QG7oF63vo=",
 }:
 let
   packageJson = lib.importJSON ../package.json;
