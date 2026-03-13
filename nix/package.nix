@@ -2,6 +2,7 @@
   lib,
   stdenv,
   bun,
+  git,
   nodejs,
   makeWrapper,
   makeDesktopItem,
@@ -72,12 +73,20 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   nativeBuildInputs = [
+    git
     nodejs
     bun
     autoPatchelfHook
     copyDesktopItems
     makeWrapper
   ];
+
+  postPatch = ''
+    # electron-builder tries to mutate the copied Electron binary when
+    # electronFuses is configured, which fails against Nix store-sourced bits.
+    substituteInPlace package.json \
+      --replace-fail '"electronFuses": {' '"electronFusesDisabledForNix": {'
+  '';
 
   buildInputs = [
     libpulseaudio
