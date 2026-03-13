@@ -44,6 +44,9 @@ stdenv.mkDerivation (finalAttrs: {
     ];
 
     dontConfigure = true;
+    # Fixed-output derivations cannot contain store path references.
+    # stdenv fixup may patch shebangs to /nix/store/.../bash, so disable it here.
+    dontFixup = true;
     buildPhase = ''
       runHook preBuild
 
